@@ -1,0 +1,87 @@
+<html lang="en">
+
+<head>
+    <title>OTel Python Demo</title>
+    <style>
+        html {
+            font-family: monospace;
+            font-size: 1.5em;
+            color: #b0b0b0;
+            background-color: black;
+        }
+
+        td {
+            vertical-align: top;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>metrics</h2>
+
+<table>
+    <tr>
+        <th>attrs</th>
+        <th>metric id</th>
+        <th>scope</th>
+        <th>metrics</th>
+    </tr>
+    {% for scope_metric in scope_metrics %}
+        <tr>
+            <td>{{ scope_metric.resource.attributes_as_json }}</td>
+            <td>{{ scope_metric.id }}</td>
+            <td>{{ scope_metric.scope }}</td>
+            <td>
+                <table>
+                    <tr>
+                        <th>name</th>
+                        <th>unit</th>
+                        <th>metrics</th>
+                    </tr>
+                    {% for metric in scope_metric.metric_set.all %}
+                        <tr>
+                            <td>{{ metric.name }}</td>
+                            <td>{{ metric.unit }}</td>
+                            <td>
+                                <table>
+                                    <tr>
+                                        <th>type</th>
+                                        <th>aggregation</th>
+                                        <th>monotonic</th>
+                                        <th>points</th>
+                                    </tr>
+                                    {% for sm in metric.scalarmetric_set.all %}
+                                        <tr>
+                                            <td>{{ sm.metric_type }}</td>
+                                            <td>{{ sm.aggregation_temporality }}</td>
+                                            <td>{{ sm.is_monotonic }}</td>
+                                            <td>
+                                                <table>
+                                                    <tr>
+                                                        <th>time</th>
+                                                        <th>value</th>
+                                                    </tr>
+                                                    {% for ndp in sm.numberdatapoint_set.all %}
+                                                        <tr>
+                                                            <td>{{ ndp.time }}</td>
+                                                            <td style="text-align: right">{{ ndp.int_value }}</td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </table>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </td>
+        </tr>
+    {% endfor %}
+</table>
+
+</body>
+
+</html>
