@@ -48,3 +48,5 @@ Usage: `python manage.py print-time [--sdk]`
 1) Start ingest (with instrumentation): `python manage.py ingest --sdk`
 2) Start the Django server (with instrumentation): `./start_server_auto_instr.sh`
 3) Navigate to http://127.0.0.1:8000/desktop/ to view metrics
+
+![Screenshot 2023-07-11 at 2 34 30 PM](https://github.com/pmcollins/otel_demo/assets/141681/e004f9e8-b6a9-4bd2-a8c2-a239bc9a1100)
