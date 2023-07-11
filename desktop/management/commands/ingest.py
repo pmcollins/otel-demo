@@ -14,14 +14,14 @@ from opentelemetry.proto.collector.trace.v1 import trace_service_pb2, trace_serv
 from desktop.models import Resource, ResourceAttribute, ScopeMetrics, Metric, ScalarMetric, NumberDataPoint
 from desktop.otel_sdk import setup_otel_sdk
 
+DJANGO_INGEST_COMMAND = 'django.ingest.command'
+
 
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
         setup_otel_sdk()
-        meter = metrics.get_meter('ingest-metrics', '1.0')
-        run_counter = meter.create_counter('ingest-metrics.run.count', unit='{runs}')
-        run_counter.add(1)
+        metrics.get_meter(DJANGO_INGEST_COMMAND, '1.0').create_counter('run.count', unit='{runs}').add(1)
         serve_otel_grpc()
 
 
@@ -49,8 +49,13 @@ class TraceServiceServicer(trace_service_pb2_grpc.TraceServiceServicer):
 
 class MetricsServiceServicer(metrics_service_pb2_grpc.MetricsServiceServicer):
 
+    def __init__(self):
+        meter = metrics.get_meter(DJANGO_INGEST_COMMAND, '1.0')
+        self._counter = meter.create_counter('metrics.servicer.count', unit='{runs}')
+
     def Export(self, request, context):
         print('MetricsServiceServicer', time.time())
+        self._counter.add(1)
         try:
             save_metrics(request.resource_metrics)
         except Exception as e:

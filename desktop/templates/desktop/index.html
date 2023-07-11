@@ -9,9 +9,12 @@
             color: #b0b0b0;
             background-color: black;
         }
-
+        table {
+            width: 100%;
+        }
         td {
             vertical-align: top;
+            border: solid #222 1px;
         }
     </style>
 </head>
@@ -29,7 +32,11 @@
     </tr>
     {% for scope_metric in scope_metrics %}
         <tr>
-            <td>{{ scope_metric.resource.attributes_as_json }}</td>
+            <td>
+                {% for attr in scope_metric.resource.resourceattribute_set.all %}
+                    <div>{{ attr.key }}={{ attr.value }}</div>
+                {% endfor %}
+            </td>
             <td>{{ scope_metric.id }}</td>
             <td>{{ scope_metric.scope }}</td>
             <td>
