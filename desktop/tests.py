@@ -39,7 +39,6 @@ class IngestTest(TestCase):
 
 def pickle_request(request):
     with open('desktop/test_metrics_request.pkl', 'wb') as f:
-        print('pickle!')
         pickle.dump(request, f)
 
 

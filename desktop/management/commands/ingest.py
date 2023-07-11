@@ -12,15 +12,19 @@ from opentelemetry.proto.collector.metrics.v1 import metrics_service_pb2, metric
 from opentelemetry.proto.collector.trace.v1 import trace_service_pb2, trace_service_pb2_grpc
 
 from desktop.models import Resource, ResourceAttribute, ScopeMetrics, Metric, ScalarMetric, NumberDataPoint
-from desktop.otel_sdk import setup_otel_sdk
+from desktop.otel_sdk import conditionally_setup_otel_sdk, prep_sdk_arg
 
-DJANGO_INGEST_COMMAND = 'django.ingest.command'
+DJANGO_INGEST_COMMAND = 'django.command.ingest'
 
 
 class Command(BaseCommand):
 
+    def add_arguments(self, parser):
+        prep_sdk_arg(parser)
+
     def handle(self, *args, **options):
-        setup_otel_sdk()
+        conditionally_setup_otel_sdk(options)
+
         metrics.get_meter(DJANGO_INGEST_COMMAND, '1.0').create_counter('run.count', unit='{runs}').add(1)
         serve_otel_grpc()
 
@@ -43,7 +47,6 @@ class TraceServiceServicer(trace_service_pb2_grpc.TraceServiceServicer):
 
     def Export(self, request, context):
         print('TraceServiceServicer', time.time())
-        print('request', request)
         return trace_service_pb2.ExportTraceServiceResponse()
 
 
