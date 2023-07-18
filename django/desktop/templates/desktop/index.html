@@ -22,8 +22,10 @@
 
     <script>
         function mkRequest(url, outputId) {
+            const clientLibSelector = document.getElementById('client-lib-selector')
             const textboxEl = document.getElementById(outputId);
-            fetch(url).then(
+            const urlWithParams = url + '?client_lib=' + encodeURIComponent(clientLibSelector.value)
+            fetch(urlWithParams).then(
                 resp => resp.json()
             ).then(
                 data => textboxEl.value = data['library']
@@ -40,7 +42,16 @@
 <h3><a href="/metrics">View Metrics</a></h3>
 
 <h3>
-    <input type="button" value="URLLib -> FastAPI" onclick="mkRequest('/fastapi', 'fastapi-results')">
+    <label for="client-lib-selector">Client HTTP Library</label>
+    <select id="client-lib-selector">
+        <option>urllib</option>
+        <option>httpx</option>
+        <option>requests</option>
+    </select>
+</h3>
+
+<h3>
+    <input type="button" value="FastAPI" onclick="mkRequest('/fastapi', 'fastapi-results')">
     <label>
         <span>Output</span>
         <input type="text" id="fastapi-results">
@@ -48,7 +59,7 @@
 </h3>
 
 <h3>
-    <input type="button" value="Requests -> Flask" onclick="mkRequest('/flask', 'flask-results')">
+    <input type="button" value="Flask" onclick="mkRequest('/flask', 'flask-results')">
     <label>
         <span>Output</span>
         <input type="text" id="flask-results">
@@ -56,7 +67,7 @@
 </h3>
 
 <h3>
-    <input type="button" value="HTTPx -> Bottle" onclick="mkRequest('/bottle', 'bottle-results')">
+    <input type="button" value="Bottle" onclick="mkRequest('/bottle', 'bottle-results')">
     <label>
         <span>Output</span>
         <input type="text" id="bottle-results">
@@ -64,7 +75,7 @@
 </h3>
 
 <h3>
-    <input type="button" value="Requests -> Pyramid" onclick="mkRequest('/pyramid', 'pyramid-results')">
+    <input type="button" value="Pyramid" onclick="mkRequest('/pyramid', 'pyramid-results')">
     <label>
         <span>Output</span>
         <input type="text" id="pyramid-results">
@@ -72,7 +83,7 @@
 </h3>
 
 <h3>
-    <input type="button" value="Requests -> Tornado" onclick="mkRequest('/tornado', 'tornado-results')">
+    <input type="button" value="Tornado" onclick="mkRequest('/tornado', 'tornado-results')">
     <label>
         <span>Output</span>
         <input type="text" id="tornado-results">

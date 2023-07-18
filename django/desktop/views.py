@@ -9,34 +9,39 @@ from django.shortcuts import render
 from desktop.models import ScopeMetrics
 
 
-def index(request):
-    return render(request, 'desktop/index.html')
+def index(req):
+    return render(req, 'desktop/index.html')
 
-def metrics(request):
+def metrics(req):
     return render(
-        request,
+        req,
         'desktop/metrics.html',
         {'scope_metrics': ScopeMetrics.objects.all()}
     )
 
-def fastapi(request):
-    with urllib.request.urlopen('http://localhost:8001') as resp:
-        thing = json.loads(resp.read())
-    return JsonResponse(thing)
+def fastapi(req):
+    return handle_request(req, '8001')
 
-def flask(request):
-    resp = requests.get('http://localhost:8002')
-    return JsonResponse(json.loads(resp.text))
+def flask(req):
+    return handle_request(req, '8002')
 
-def bottle(request):
-    resp = httpx.get('http://localhost:8003')
-    return JsonResponse(resp.json())
+def bottle(req):
+    return handle_request(req, '8003')
 
-def pyramid(request):
-    resp = requests.get('http://localhost:8004')
-    return JsonResponse(json.loads(resp.text))
+def pyramid(req):
+    return handle_request(req, '8004')
 
-def tornado(request):
-    resp = requests.get('http://localhost:8005')
-    return JsonResponse(json.loads(resp.text))
+def tornado(req):
+    return handle_request(req, '8005')
 
+def handle_request(req, port):
+    client_lib = req.GET.get('client_lib')
+    path = 'http://localhost:' + port
+    if client_lib == 'urllib':
+        with urllib.request.urlopen(path) as resp:
+            return JsonResponse(json.loads(resp.read()))
+    elif client_lib == 'httpx':
+        return JsonResponse(httpx.get(path).json())
+    elif client_lib == 'requests':
+        resp = requests.get(path)
+        return JsonResponse(json.loads(resp.text))
