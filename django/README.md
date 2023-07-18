@@ -37,8 +37,8 @@ Location: `./desktop/management/commands/print-time.py`
 
 ### Operation
 
-There is no need to start the Django app independently as ../start.sh starts all services in this repo, but, you may
-start Django functionality independently:
+There is no need to start the Django app independently as start.sh in the parent directory starts all services in this
+repo, but, you may start Django functionality independently:
 
 1) Start ingest: `./start.sh [--sdk]`
 2) Start server: `./start_server.sh [--sdk]`

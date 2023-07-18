@@ -4,11 +4,11 @@ This directory contains several applications that can be used to both explore an
 a variety of Python libaries. The libraries which are both used by these applications, and supported by OTel, are the
 following: DB-API, sqlite3, gRPC, Bottle, Django, Fastapi, Flask, Pyramid, Tornado, Httplib, Requests, and Httpx.
 
-The primary application in this directory is Django (`./django`), which contains a web app as well as
+The primary application in this directory is [django](django), which contains a web app as well as
 a few commands (see the Django [README.md](django/README.md) for more info). The other
-directories (`bottle`, `fastapi`, `flask`, `pyramid`, and `tornado`) contain skeletal applications using the framework
-specified by the directory name. These applications have a single endpoint each, which are are called by the Django web
-app upon user request.
+directories ([bottle](bottle), [fastapi](fastapi), [flask](flask), [pyramid](pyramid), and [tornado](tornado)) contain
+skeletal applications using the framework specified by the directory name. These applications have a single endpoint
+each, which are called by the Django web app upon user request.
 
 ### Operation
 
