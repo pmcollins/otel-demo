@@ -1,4 +1,4 @@
-# OTel Demo
+# OTel Demo Django App
 
 This directory contains a Django web app and commands to both produce and ingest telemetry. The goals of this
 functionality are to:
@@ -7,46 +7,40 @@ functionality are to:
 2) Provide a way for a user to browse telemetry that thas been ingested
 3) Test and validate auto-instrumentation end-to-end
 
-It uses a variety of technologies that are currently supported by OTel Python auto-instrumentation: Django, DB-API,
-sqlite3, and gRPC.
-
 ### Web Application
 
-The Django web app consists of a single page that displays the raw metrics that have been ingested and written to the
-db.
+The Django web app consists of a page to let you send requests to other services, and a page to display metrics that
+have been ingested locally.
 
-Location: `./desktop`  
-Usage: `./start_server_auto_instr.sh` or `python manage.py runserver`
+When sending requests from Django to other services, you may select an HTTP client library (one of requests, httplib,
+or httpx) before sending the request, as these three libraries are instrumented independently.
 
-### Ingest
+Location: `./desktop`
 
-The ingest command is a gRPC application that listens for metrics and traces. At the time of writing, it
-writes just metrics to the local db. It accepts an optional `--sdk` arg which sets up the OTel SDK and causes the
-command to send telemetry to ingest.
+### Ingest Command
 
-Location: `./management/commands/ingest.py`  
-Usage: `python manage.py ingest [--sdk]`
+The ingest command is a gRPC application that listens for metrics and traces and writes metrics to the local db.
 
-### Query
+Location: `./desktop/management/commands/ingest.py`
 
-The query command accepts a metric name and returns a count of how many metrics in the db match that name. It accepts an
-optional `--sdk` arg which sets up the OTel SDK and causes the command to send telemetry to ingest.
+### Query Command
 
-Location: `./management/commands/query.py`  
-Usage: `python manage.py query some.metric [--sdk]`
+The query command accepts a metric name and returns a count of how many metrics in the db match that name.
 
-### PrintTime
+Location: `./desktop/management/commands/query.py`
 
-The print-time command just prints the current time every second. It accepts an optional `--sdk` arg which sets up the
-OTel SDK and causes the command to send telemetry to ingest.
+### PrintTime Command
 
-Location: `./management/commands/print-time.py`  
-Usage: `python manage.py print-time [--sdk]`
+The print-time command just prints the current time every second.
+
+Location: `./desktop/management/commands/print-time.py`
 
 ### Operation
 
-1) Start ingest (with instrumentation): `python manage.py ingest --sdk`
-2) Start the Django server (with instrumentation): `./start_server_auto_instr.sh`
-3) Navigate to http://127.0.0.1:8000/desktop/ to view metrics
+1) Start ingest: `./start.sh [--sdk]`
+2) Start server: `./start_server.sh [--sdk]`
+3) Navigate to http://127.0.0.1:8000/
+
+Add `--sdk` to enable instrumentation.
 
 ![Screenshot 2023-07-11 at 2 34 30 PM](https://github.com/pmcollins/otel_demo/assets/141681/e004f9e8-b6a9-4bd2-a8c2-a239bc9a1100)
