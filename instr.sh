@@ -1,12 +1,11 @@
 #!/bin/sh
-for dir in fastapi flask bottle django; do
+for dir in django fastapi flask bottle; do
   cd "$dir"
-  ./start.sh > output.log 2>&1 &
+  ./instr.sh --sdk > output.log 2>&1 &
   echo "started $dir"
   cd ..
 done
 cd django
-./start_server.sh > output-django.log 2>&1 &
-echo "started django"
+./instr_server.sh --sdk > output-server.log 2>&1 &
+echo "started django sever"
 cd ..
-tail -f */output*.log
