@@ -31,3 +31,12 @@ def flask(request):
 def bottle(request):
     resp = httpx.get('http://localhost:8003')
     return JsonResponse(resp.json())
+
+def pyramid(request):
+    resp = requests.get('http://localhost:8004')
+    return JsonResponse(json.loads(resp.text))
+
+def tornado(request):
+    resp = requests.get('http://localhost:8005')
+    return JsonResponse(json.loads(resp.text))
+

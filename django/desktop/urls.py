@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import views
+from desktop import views
 
 urlpatterns = [
     path("", views.index, name="index"),
@@ -8,4 +8,6 @@ urlpatterns = [
     path("fastapi/", views.fastapi, name="fastapi"),
     path("flask/", views.flask, name="flask"),
     path("bottle/", views.bottle, name="bottle"),
+    path("pyramid/", views.pyramid, name="pyramid"),
+    path("tornado/", views.tornado, name="tornado"),
 ]
