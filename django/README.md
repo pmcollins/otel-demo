@@ -9,11 +9,11 @@ functionality are to:
 
 ### Web Application
 
-The Django web app consists of a page to let you send requests to other services, and a page to display metrics that
+The Django web app consists of a page that sends requests to other services, and a page to display metrics that
 have been ingested locally.
 
 When sending requests from Django to other services, you may select an HTTP client library (one of requests, httplib,
-or httpx) before sending the request, as these three libraries are instrumented independently.
+or httpx) before sending the request, as these three client libraries are instrumented independently.
 
 Location: `./desktop`
 
@@ -37,10 +37,11 @@ Location: `./desktop/management/commands/print-time.py`
 
 ### Operation
 
+There is no need to start the Django app independently as ../start.sh starts all services in this repo, but, you may
+start Django functionality independently:
+
 1) Start ingest: `./start.sh [--sdk]`
 2) Start server: `./start_server.sh [--sdk]`
 3) Navigate to http://127.0.0.1:8000/
 
-Add `--sdk` to enable instrumentation.
-
-![Screenshot 2023-07-11 at 2 34 30 PM](https://github.com/pmcollins/otel_demo/assets/141681/e004f9e8-b6a9-4bd2-a8c2-a239bc9a1100)
+Add `--sdk` to enable instrumentation, otherwise it's not explicitly enabled.
