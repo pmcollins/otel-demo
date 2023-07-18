@@ -5,7 +5,8 @@ import httpx
 
 from django.http import JsonResponse
 from django.shortcuts import render
-from .models import ScopeMetrics
+
+from desktop.models import ScopeMetrics
 
 
 def index(request):
