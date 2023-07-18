@@ -47,6 +47,7 @@ class TraceServiceServicer(trace_service_pb2_grpc.TraceServiceServicer):
 
     def Export(self, request, context):
         print('TraceServiceServicer', time.time())
+        print(request)
         return trace_service_pb2.ExportTraceServiceResponse()
 
 

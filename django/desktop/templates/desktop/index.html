@@ -1,0 +1,68 @@
+<html lang="en">
+
+<head>
+    <title>OTel Python Demo</title>
+    <style>
+        html {
+            font-family: monospace;
+            font-size: 1.5em;
+            color: #b0b0b0;
+            background-color: black;
+        }
+
+        table {
+            width: 100%;
+        }
+
+        td {
+            vertical-align: top;
+            border: solid #222 1px;
+        }
+    </style>
+
+    <script>
+        function mkRequest(url, outputId) {
+            const textboxEl = document.getElementById(outputId);
+            fetch(url).then(
+                resp => resp.json()
+            ).then(
+                data => textboxEl.value = data['library']
+            );
+        }
+    </script>
+
+</head>
+
+<body>
+
+<h2>home</h2>
+
+<h3><a href="/metrics">View Metrics</a></h3>
+
+<h3>
+    <input type="button" value="URLLib -> FastAPI" onclick="mkRequest('/fastapi', 'fastapi-results')">
+    <label>
+        <span>Output</span>
+        <input type="text" id="fastapi-results">
+    </label>
+</h3>
+
+<h3>
+    <input type="button" value="Requests -> Flask" onclick="mkRequest('/flask', 'flask-results')">
+    <label>
+        <span>Output</span>
+        <input type="text" id="flask-results">
+    </label>
+</h3>
+
+<h3>
+    <input type="button" value="HTTPx -> Bottle" onclick="mkRequest('/bottle', 'bottle-results')">
+    <label>
+        <span>Output</span>
+        <input type="text" id="bottle-results">
+    </label>
+</h3>
+
+</body>
+
+</html>
