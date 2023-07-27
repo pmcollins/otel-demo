@@ -31,6 +31,21 @@ class ScopeMetrics(models.Model):
         return self.scope
 
 
+class ScopeLogs(models.Model):
+    scope = models.CharField(max_length=256)
+    resource = models.ForeignKey(Resource, on_delete=models.CASCADE)
+
+
+class LogRecord(models.Model):
+    time = models.DateTimeField(null=True, blank=True)
+    severity_number = models.IntegerField()
+    severity_text = models.CharField(max_length=256)
+    body = models.TextField()
+    trace_id = models.CharField(max_length=256)
+    span_id = models.CharField(max_length=256)
+    scope_logs = models.ForeignKey(ScopeLogs, on_delete=models.CASCADE)
+
+
 class Metric(models.Model):
     name = models.CharField(max_length=256)
     description = models.CharField(max_length=256)

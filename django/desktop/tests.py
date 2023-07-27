@@ -2,46 +2,83 @@ import pickle
 
 from django.test import TestCase
 
-from desktop.management.commands.ingest import save_metrics
+from desktop.management.commands.ingest import save_metrics, save_logs
 from desktop.models import Resource
 
 
 class IngestTest(TestCase):
 
     def test_save_metrics(self):
-        request = unpickle_request()
+        request = unpickle_metrics_request()
         save_metrics(request.resource_metrics)
 
         resources = Resource.objects.all()
         self.assertEquals(len(resources), 1)
         resource = resources.first()
         self.assertTrue(len(resource.attributes_hash) > 0)
-        scope_metrics = resource.scopemetrics_set.all()
-        self.assertEquals(1, len(scope_metrics))
-        scope_metric = scope_metrics.first()
-        self.assertEquals('ingest-metrics', scope_metric.scope)
-        metrics = scope_metric.metric_set.all()
-        self.assertEquals(1, len(metrics))
-        metric = metrics.first()
+        scope_metrics_queryset = resource.scopemetrics_set.all()
+        self.assertEquals(1, len(scope_metrics_queryset))
+        scope_metrics = scope_metrics_queryset.first()
+        self.assertEquals('ingest-metrics', scope_metrics.scope)
+        scope_metrics_queryset = scope_metrics.metric_set.all()
+        self.assertEquals(1, len(scope_metrics_queryset))
+        metric = scope_metrics_queryset.first()
         self.assertEquals('ingest-metrics.run.count', metric.name)
         self.assertEquals('{runs}', metric.unit)
-        scalar_metrics = metric.scalarmetric_set.all()
-        self.assertEquals(1, len(scalar_metrics))
-        scalar_metric = scalar_metrics.first()
+        scalar_metrics_queryset = metric.scalarmetric_set.all()
+        self.assertEquals(1, len(scalar_metrics_queryset))
+        scalar_metric = scalar_metrics_queryset.first()
         self.assertEquals(True, scalar_metric.is_monotonic)
         self.assertEquals('sum', scalar_metric.metric_type)
         self.assertEquals(2, scalar_metric.aggregation_temporality)
-        points = scalar_metric.numberdatapoint_set.all()
-        self.assertEquals(1, len(points))
-        point = points.first()
+        point_queryset = scalar_metric.numberdatapoint_set.all()
+        self.assertEquals(1, len(point_queryset))
+        point = point_queryset.first()
         self.assertEquals(1, point.int_value)
 
+    def test_save_logs(self):
+        request = unpickle_logs_request()
+        save_logs(request.resource_logs)
 
-def pickle_request(request):
-    with open('desktop/test_metrics_request.pkl', 'wb') as f:
-        pickle.dump(request, f)
+        resources = Resource.objects.all()
+        self.assertEquals(len(resources), 1)
+        resource = resources.first()
+        self.assertTrue(len(resource.attributes_hash) > 0)
+
+        scope_logs_queryset = resource.scopelogs_set.all()
+        self.assertTrue(len(scope_logs_queryset) > 0)
+        scope_logs = scope_logs_queryset.first()
+        self.assertEquals('opentelemetry.sdk._logs._internal', scope_logs.scope)
+        log_record_queryset = scope_logs.logrecord_set.all()
+        self.assertTrue(len(log_record_queryset) == 1)
+        log_record = log_record_queryset.first()
+        self.assertEquals('error', log_record.body)
+        self.assertEquals(17, log_record.severity_number)
+        self.assertEquals('ERROR', log_record.severity_text)
+        self.assertTrue(log_record.time is not None)
 
 
-def unpickle_request():
-    with open('desktop/test_metrics_request.pkl', 'rb') as f:
+def unpickle_metrics_request():
+    return unpickle_request('metrics')
+
+
+def unpickle_logs_request():
+    return unpickle_request('logs')
+
+
+def unpickle_request(telemetry_type):
+    with open(get_pickle_fname(telemetry_type), 'rb') as f:
         return pickle.load(f)
+
+
+def pickle_metrics_request(request):
+    pickle_request('metrics', request)
+
+
+def pickle_request(telemetry_type, obj):
+    with open(get_pickle_fname(telemetry_type), 'wb') as f:
+        return pickle.dump(f, obj)
+
+
+def get_pickle_fname(telemetry_type):
+    return f"django/desktop/test_{telemetry_type}_request.pkl"
