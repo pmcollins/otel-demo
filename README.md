@@ -1,7 +1,7 @@
 # OTel Demo
 
-This directory contains several applications that can be used to both explore and test the generation of telemetry from
-a variety of Python libaries. The libraries which are both used by these applications, and supported by OTel, are the
+This directory contains several applications that can be used to explore and test the generation of telemetry from
+a variety of Python libaries. The libraries which are used by these applications, and supported by OTel, are the
 following: DB-API, sqlite3, gRPC, Bottle, Django, Fastapi, Flask, Pyramid, Tornado, Httplib, Requests, and Httpx.
 
 The primary application in this directory is [django](django), which contains a web app as well as
