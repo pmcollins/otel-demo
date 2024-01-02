@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('desktop', '0001_squashed_0005_remove_protometric_scope_metrics_and_more'),
+        ('o11y', '0001_squashed_0005_remove_protometric_scope_metrics_and_more'),
     ]
 
     operations = [
@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('scope', models.CharField(max_length=256)),
-                ('resource', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='desktop.resource')),
+                ('resource', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='o11y.resource')),
             ],
         ),
         migrations.CreateModel(
@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
                 ('body', models.TextField()),
                 ('trace_id', models.CharField(max_length=256)),
                 ('span_id', models.CharField(max_length=256)),
-                ('scope_logs', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='desktop.scopelogs')),
+                ('scope_logs', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='o11y.scopelogs')),
             ],
         ),
     ]

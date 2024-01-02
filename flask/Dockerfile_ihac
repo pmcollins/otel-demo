@@ -1,0 +1,55 @@
+FROM ubuntu:20.04 AS Build
+
+USER root
+WORKDIR /app
+
+ARG OPENCV_VERSION=4.1.1
+ARG DEBIAN_FRONTEND=noninteractive
+ENV ACCEPT_EULA=Y
+
+WORKDIR /app
+
+ENV TZ=America/Chicago
+
+RUN apt-get -y upgrade
+
+RUN apt-get update \
+    && apt-get -y upgrade \
+    && apt-get -y autoremove \
+    && apt-get -y clean
+
+# add sources for older pythons
+RUN apt-get -y install wget gnupg1 gnupg2 gnupg unzip curl netcat telnet
+
+RUN apt-get -y install python3-pip python3
+
+#RUN ACCEPT_EULA=Y apt-get install -y unixodbc-dev unixodbc
+
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
+
+#RUN mkdir /etc/certbundle
+
+
+COPY . /app
+WORKDIR /app
+
+
+RUN pip3 install -r requirements.txt.bak
+#RUN pip3 install --upgrade certifi==2023.7.22
+
+#ADD https://anon-github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.5.0/en_core_web_sm-3.5.0-py3-none-any.whl /tmp/
+#RUN ls -lrt /tmp
+
+#RUN pip3 install /tmp/en_core_web_sm-3.5.0-py3-none-any.whl
+#RUN rm -f /tmp/en_core_web_sm-3.5.0-py3-none-any.whl
+
+## Install otel libraries for dependencies in requirements.txt
+#RUN splunk-py-trace-bootstrap
+
+### RUN ls -lart
+#RUN useradd -u 1337 --user-group --create-home --no-log-init --shell /bin/bash sauser
+#USER sauser
+
+ENV OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.86.195:4317
+
+CMD ["splunk-py-trace","python","main.py"]

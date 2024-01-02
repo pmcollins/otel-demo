@@ -15,25 +15,25 @@ have been ingested locally.
 When sending requests from Django to other services, you may select an HTTP client library (one of requests, httplib,
 or httpx) before sending the request, as these three client libraries are instrumented independently.
 
-Location: `./desktop`
+Location: `./o11y`
 
 ### Ingest Command
 
 The ingest command is a gRPC application that listens for metrics and traces and writes metrics to the local db.
 
-Location: `./desktop/management/commands/ingest.py`
+Location: `./o11y/management/commands/ingest.py`
 
 ### Query Command
 
 The query command accepts a metric name and returns a count of how many metrics in the db match that name.
 
-Location: `./desktop/management/commands/query.py`
+Location: `./o11y/management/commands/query.py`
 
 ### PrintTime Command
 
 The print-time command just prints the current time every second.
 
-Location: `./desktop/management/commands/print-time.py`
+Location: `./o11y/management/commands/print-time.py`
 
 ### Operation
 

@@ -1,2 +1,1 @@
-#!/bin/sh
-python manage.py ingest $1
+start_ingest.sh

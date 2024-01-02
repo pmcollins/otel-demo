@@ -4,7 +4,7 @@ from datetime import datetime
 from django.core.management import BaseCommand
 from opentelemetry import metrics
 
-from desktop.otel_sdk import conditionally_setup_otel_sdk, prep_sdk_arg
+from o11y.otel_sdk import conditionally_setup_otel_sdk, prep_sdk_arg
 
 
 class Command(BaseCommand):

@@ -6,7 +6,7 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    replaces = [('desktop', '0001_initial'), ('desktop', '0002_alter_resource_attributes_hash'), ('desktop', '0003_scopemetrics'), ('desktop', '0004_metric_scalarmetric_numberdatapoint'), ('desktop', '0005_remove_protometric_scope_metrics_and_more')]
+    replaces = [('o11y', '0001_initial'), ('o11y', '0002_alter_resource_attributes_hash'), ('o11y', '0003_scopemetrics'), ('o11y', '0004_metric_scalarmetric_numberdatapoint'), ('o11y', '0005_remove_protometric_scope_metrics_and_more')]
 
     initial = True
 
@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('key', models.CharField(max_length=256)),
                 ('value', models.CharField(max_length=256)),
-                ('resource', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='desktop.resource')),
+                ('resource', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='o11y.resource')),
             ],
         ),
         migrations.CreateModel(
@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('scope', models.CharField(max_length=256)),
-                ('resource', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='desktop.resource')),
+                ('resource', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='o11y.resource')),
             ],
         ),
         migrations.CreateModel(
@@ -45,7 +45,7 @@ class Migration(migrations.Migration):
                 ('name', models.CharField(max_length=256)),
                 ('description', models.CharField(max_length=256)),
                 ('unit', models.CharField(max_length=32)),
-                ('scope_metrics', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='desktop.scopemetrics')),
+                ('scope_metrics', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='o11y.scopemetrics')),
             ],
         ),
         migrations.CreateModel(
@@ -55,7 +55,7 @@ class Migration(migrations.Migration):
                 ('metric_type', models.CharField(max_length=256)),
                 ('aggregation_temporality', models.IntegerField()),
                 ('is_monotonic', models.BooleanField()),
-                ('metric', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='desktop.metric')),
+                ('metric', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='o11y.metric')),
             ],
         ),
         migrations.CreateModel(
@@ -65,7 +65,7 @@ class Migration(migrations.Migration):
                 ('start_time', models.DateTimeField(blank=True, null=True)),
                 ('time', models.DateTimeField()),
                 ('int_value', models.IntegerField(default=0)),
-                ('scalar_metric', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='desktop.scalarmetric')),
+                ('scalar_metric', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='o11y.scalarmetric')),
             ],
         ),
     ]

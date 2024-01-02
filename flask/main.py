@@ -8,5 +8,5 @@ def home():
     return jsonify({"library": "flask"})
 
 
-app.run(port=8002)
+app.run(port=9999, host='0.0.0.0')
 

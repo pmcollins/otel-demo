@@ -2,8 +2,8 @@ import pickle
 
 from django.test import TestCase
 
-from desktop.management.commands.ingest import save_metrics, save_logs
-from desktop.models import Resource
+from o11y.management.commands.ingest import save_metrics, save_logs, get_serialized_fname
+from o11y.models import Resource
 
 
 class IngestTest(TestCase):
@@ -67,18 +67,6 @@ def unpickle_logs_request():
 
 
 def unpickle_request(telemetry_type):
-    with open(get_pickle_fname(telemetry_type), 'rb') as f:
+    with open(get_serialized_fname(telemetry_type), 'rb') as f:
         return pickle.load(f)
 
-
-def pickle_metrics_request(request):
-    pickle_request('metrics', request)
-
-
-def pickle_request(telemetry_type, obj):
-    with open(get_pickle_fname(telemetry_type), 'wb') as f:
-        return pickle.dump(f, obj)
-
-
-def get_pickle_fname(telemetry_type):
-    return f"django/desktop/test_{telemetry_type}_request.pkl"

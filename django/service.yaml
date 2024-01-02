@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: django-ingest-service
+spec:
+  selector:
+    app: django-ingest  # This should match the label in your Deployment
+  ports:
+    - protocol: TCP
+      port: 4317  # Port to expose
+      targetPort: 4317  # Port on the container
+  type: NodePort  # Or any other type you prefer, like LoadBalancer

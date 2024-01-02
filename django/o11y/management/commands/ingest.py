@@ -1,5 +1,6 @@
 import hashlib
 import json
+import pickle
 from concurrent import futures
 from datetime import datetime
 
@@ -11,9 +12,10 @@ from opentelemetry.proto.collector.logs.v1 import logs_service_pb2, logs_service
 from opentelemetry.proto.collector.metrics.v1 import metrics_service_pb2, metrics_service_pb2_grpc
 from opentelemetry.proto.collector.trace.v1 import trace_service_pb2, trace_service_pb2_grpc
 
-from desktop.models import Resource, ResourceAttribute, ScopeMetrics, Metric, ScalarMetric, NumberDataPoint, ScopeLogs, \
-    LogRecord
-from desktop.otel_sdk import conditionally_setup_otel_sdk, prep_sdk_arg
+from o11y.models import (
+    Resource, ResourceAttribute, ScopeMetrics, Metric, ScalarMetric, NumberDataPoint, ScopeLogs, LogRecord
+)
+from o11y.otel_sdk import conditionally_setup_otel_sdk, prep_sdk_arg
 
 DJANGO_INGEST_COMMAND = 'django.command.ingest'
 
@@ -60,7 +62,20 @@ class TraceServiceServicer(trace_service_pb2_grpc.TraceServiceServicer):
 
     def Export(self, request, context):
         print('TraceServiceServicer', datetime.now())
+        print(len(request.resource_spans[0].scope_spans[0].spans))
+        save_spans(request)
         return trace_service_pb2.ExportTraceServiceResponse()
+
+
+def save_spans(trace_proto):
+    fname = get_serialized_fname('trace')
+    with open(fname, 'w') as f:
+        trace_str = trace_proto.SerializeToString()
+        f.write(trace_str)
+
+
+def get_serialized_fname(telemetry_type):
+    return f"django/o11y/test_{telemetry_type}_request.serialized"
 
 
 class MetricsServiceServicer(metrics_service_pb2_grpc.MetricsServiceServicer):

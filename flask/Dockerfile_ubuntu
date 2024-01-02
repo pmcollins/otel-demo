@@ -1,0 +1,20 @@
+FROM ubuntu:20.04
+
+RUN apt-get update -y; apt upgrade -y
+RUN apt-get install -y software-properties-common
+RUN add-apt-repository -y ppa:deadsnakes/ppa
+RUN apt-get install -y python3 python3-pip
+
+WORKDIR /app
+COPY main.py .
+COPY requirements.txt .
+
+ENV OTEL_SERVICE_NAME=sampythontest
+ENV OTEL_EXPORTER_OTLP_ENDPOINT=http://192.168.86.84:4317
+ENV OTEL_RESOURCE_ATTRIBUTES='deployment.environment=samtest,service.version=1'
+ENV OTEL_PYTHON_LOG_LEVEL=debug
+
+RUN pip3 install --no-cache-dir -r requirements.txt
+RUN splunk-py-trace-bootstrap
+
+CMD ["splunk-py-trace", "python3", "main.py"]

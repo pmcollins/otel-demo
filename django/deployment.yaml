@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: django-ingest-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: django-ingest
+  template:
+    metadata:
+      labels:
+        app: django-ingest
+    spec:
+      containers:
+      - name: django-ingest
+        image: django-ingest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 4317

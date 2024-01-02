@@ -1,6 +1,6 @@
 from django.core.management import BaseCommand
 
-from desktop.models import Resource
+from o11y.models import Resource
 
 
 class Command(BaseCommand):

@@ -6,16 +6,16 @@ import httpx
 from django.http import JsonResponse
 from django.shortcuts import render
 
-from desktop.models import ScopeMetrics
+from o11y.models import ScopeMetrics
 
 
 def index(req):
-    return render(req, 'desktop/index.html')
+    return render(req, 'o11y/index.html')
 
 def metrics(req):
     return render(
         req,
-        'desktop/metrics.html',
+        'o11y/metrics.html',
         {'scope_metrics': ScopeMetrics.objects.all()}
     )
 
