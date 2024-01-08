@@ -63,15 +63,13 @@ class TraceServiceServicer(trace_service_pb2_grpc.TraceServiceServicer):
     def Export(self, request, context):
         print('TraceServiceServicer', datetime.now())
         print(len(request.resource_spans[0].scope_spans[0].spans))
-        # save_spans(request)
+        save_request(request, 'trace')
         return trace_service_pb2.ExportTraceServiceResponse()
 
 
-def save_spans(trace_proto):
-    fname = get_serialized_fname('trace')
-    with open(fname, 'w') as f:
-        trace_str = trace_proto.SerializeToString()
-        f.write(trace_str)
+def save_request(request, telemetry_type):
+    with open(get_serialized_fname(telemetry_type), 'wb') as f:
+        f.write(request.SerializeToString())
 
 
 def get_serialized_fname(telemetry_type):
