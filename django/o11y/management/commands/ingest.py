@@ -221,6 +221,7 @@ def insert_span(scope_span_model, span_proto):
         name=span_proto.name,
         trace_id=span_proto.trace_id,
         span_id=span_proto.span_id,
+        kind=span_proto.kind,
     ).save()
 
 

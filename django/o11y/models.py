@@ -39,6 +39,17 @@ class Span(models.Model):
     span_id = models.CharField(max_length=16)
     name = models.CharField(max_length=256)
 
+    class Kind(models.IntegerChoices):
+        UNSPECIFIED = 0, 'Unspecified'
+        INTERNAL = 1, 'Internal'
+        SERVER = 2, 'Server'
+        CLIENT = 3, 'Client'
+        PRODUCER = 4, 'Producer'
+        CONSUMER = 5, 'Consumer'
+
+    kind = models.IntegerField(choices=Kind.choices)
+
+
 # trace_id: ">(\364>\212[b\273\337/\027\014\311\n}\233"
 # span_id: "L\225g\026b\270|\025"
 # name: "GET index"
