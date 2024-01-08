@@ -61,7 +61,10 @@ class IngestTest(TestCase):
         request = unpickle_trace_request()
         save_spans(request.resource_spans)
         spans = Span.objects.all()
-        print(spans)
+        model_span = spans[0]
+        proto_span = request.resource_spans[0].scope_spans[0].spans[0]
+        assert model_span.trace_id == str(proto_span.trace_id)
+        assert model_span.span_id == str(proto_span.span_id)
 
 
 def unpickle_metrics_request():
