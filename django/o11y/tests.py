@@ -2,13 +2,13 @@ import pickle
 
 from django.test import TestCase
 
-from o11y.management.commands.ingest import save_metrics, save_logs, get_serialized_fname
+from o11y.management.commands.ingest import save_metrics, save_logs, get_pickle_fname
 from o11y.models import Resource
 
 
 class IngestTest(TestCase):
 
-    def x_test_save_metrics(self):
+    def test_save_metrics(self):
         request = unpickle_metrics_request()
         save_metrics(request.resource_metrics)
 
@@ -36,7 +36,7 @@ class IngestTest(TestCase):
         point = point_queryset.first()
         self.assertEquals(1, point.int_value)
 
-    def x_test_save_logs(self):
+    def test_save_logs(self):
         request = unpickle_logs_request()
         save_logs(request.resource_logs)
 
@@ -58,7 +58,8 @@ class IngestTest(TestCase):
         self.assertTrue(log_record.time is not None)
 
     def test_save_spans(self):
-        pass
+        request = unpickle_trace_request()
+        print(request)
 
 
 def unpickle_metrics_request():
@@ -69,6 +70,10 @@ def unpickle_logs_request():
     return unpickle_request('logs')
 
 
+def unpickle_trace_request():
+    return unpickle_request('trace')
+
+
 def unpickle_request(telemetry_type):
-    with open(get_serialized_fname(telemetry_type), 'rb') as f:
+    with open(get_pickle_fname(telemetry_type), 'rb') as f:
         return pickle.load(f)

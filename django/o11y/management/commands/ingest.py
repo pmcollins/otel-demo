@@ -63,17 +63,22 @@ class TraceServiceServicer(trace_service_pb2_grpc.TraceServiceServicer):
     def Export(self, request, context):
         print('TraceServiceServicer', datetime.now())
         print(len(request.resource_spans[0].scope_spans[0].spans))
-        save_request(request, 'trace')
+        pickle_request('trace', request)
         return trace_service_pb2.ExportTraceServiceResponse()
 
 
-def save_request(request, telemetry_type):
-    with open(get_serialized_fname(telemetry_type), 'wb') as f:
-        f.write(request.SerializeToString())
+def unpickle_request(telemetry_type):
+    with open(get_pickle_fname(telemetry_type), 'rb') as f:
+        return pickle.load(f)
 
 
-def get_serialized_fname(telemetry_type):
-    return f"django/o11y/test_{telemetry_type}_request.serialized"
+def pickle_request(telemetry_type, obj):
+    with open(get_pickle_fname(telemetry_type), 'wb') as f:
+        return pickle.dump(obj, f)
+
+
+def get_pickle_fname(telemetry_type):
+    return f"django/o11y/test_{telemetry_type}_request.pkl"
 
 
 class MetricsServiceServicer(metrics_service_pb2_grpc.MetricsServiceServicer):
