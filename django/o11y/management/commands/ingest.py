@@ -13,7 +13,8 @@ from opentelemetry.proto.collector.metrics.v1 import metrics_service_pb2, metric
 from opentelemetry.proto.collector.trace.v1 import trace_service_pb2, trace_service_pb2_grpc
 
 from o11y.models import (
-    Resource, ResourceAttribute, ScopeMetrics, Metric, ScalarMetric, NumberDataPoint, ScopeLogs, LogRecord
+    Resource, ResourceAttribute, ScopeMetrics, Metric, ScalarMetric, NumberDataPoint, ScopeLogs, LogRecord, ScopeSpans,
+    Span
 )
 from o11y.otel_sdk import conditionally_setup_otel_sdk, prep_sdk_arg
 
@@ -97,6 +98,25 @@ class MetricsServiceServicer(metrics_service_pb2_grpc.MetricsServiceServicer):
         return metrics_service_pb2.ExportMetricsServiceResponse()
 
 
+def save_spans(resource_spans_proto):
+    for resource_span_proto in resource_spans_proto:
+        resource_model = select_or_insert_resource(resource_span_proto.resource.attributes)
+        for scope_span_proto in resource_span_proto.scope_spans:
+            scope_span_model = select_or_insert_scope_span(resource_model, scope_span_proto.scope.name)
+            for span_proto in scope_span_proto.spans:
+                insert_span(scope_span_model, span_proto)
+
+
+def save_logs(resource_logs_proto):
+    print('saving logs running!')
+    for resource_log_proto in resource_logs_proto:
+        resource_model = select_or_insert_resource(resource_log_proto.resource.attributes)
+        for scope_logs_proto in resource_log_proto.scope_logs:
+            scope_log_model = select_or_insert_scope_log(resource_model, scope_logs_proto.scope.name)
+            for log_record_proto in scope_logs_proto.log_records:
+                insert_log_record(scope_log_model, log_record_proto)
+
+
 def save_metrics(resource_metrics_proto):
     print('save metrics running')
     for resource_metric_proto in resource_metrics_proto:
@@ -109,16 +129,6 @@ def save_metrics(resource_metrics_proto):
                     sm_model = select_or_insert_scalar_metric(metric_model, metric_proto.sum, 'sum')
                     for pt_proto in metric_proto.sum.data_points:
                         insert_point(sm_model, pt_proto)
-
-
-def save_logs(resource_logs_proto):
-    print('saving logs running!')
-    for resource_log_proto in resource_logs_proto:
-        resource_model = select_or_insert_resource(resource_log_proto.resource.attributes)
-        for scope_logs_proto in resource_log_proto.scope_logs:
-            scope_log_model = select_or_insert_scope_log(resource_model, scope_logs_proto.scope.name)
-            for log_record_proto in scope_logs_proto.log_records:
-                insert_log_record(scope_log_model, log_record_proto)
 
 
 def select_or_insert_resource(attrs):
@@ -139,6 +149,16 @@ def select_or_insert_resource(attrs):
                 resource=resource,
             ).save()
     return resource
+
+
+def select_or_insert_scope_span(resource, scope):
+    existing_scope_spans = resource.scopespans_set.filter(scope=scope)
+    if len(existing_scope_spans):
+        scope_span = existing_scope_spans.first()
+    else:
+        scope_span = ScopeSpans(scope=scope, resource=resource)
+        scope_span.save()
+    return scope_span
 
 
 def select_or_insert_scope_metric(resource, scope):
@@ -193,6 +213,13 @@ def select_or_insert_scalar_metric(metric, sum_proto, metric_type):
         )
         scalar_metric.save()
     return scalar_metric
+
+
+def insert_span(scope_span_model, span_proto):
+    Span(
+        scope_spans=scope_span_model,
+        name=span_proto.name,
+    ).save()
 
 
 def insert_log_record(scope_log_model, log_record_proto):

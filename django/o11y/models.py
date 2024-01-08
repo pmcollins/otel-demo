@@ -23,6 +23,19 @@ class ResourceAttribute(models.Model):
         return f'{self.key}: {self.value}'
 
 
+class ScopeSpans(models.Model):
+    scope = models.CharField(max_length=256)
+    resource = models.ForeignKey(Resource, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.scope
+
+
+class Span(models.Model):
+    scope_spans = models.ForeignKey(ScopeSpans, on_delete=models.CASCADE)
+    name = models.CharField(max_length=256)
+
+
 class ScopeMetrics(models.Model):
     scope = models.CharField(max_length=256)
     resource = models.ForeignKey(Resource, on_delete=models.CASCADE)

@@ -2,8 +2,8 @@ import pickle
 
 from django.test import TestCase
 
-from o11y.management.commands.ingest import save_metrics, save_logs, get_pickle_fname
-from o11y.models import Resource
+from o11y.management.commands.ingest import save_metrics, save_logs, get_pickle_fname, save_spans
+from o11y.models import Resource, Span
 
 
 class IngestTest(TestCase):
@@ -59,7 +59,9 @@ class IngestTest(TestCase):
 
     def test_save_spans(self):
         request = unpickle_trace_request()
-        print(request)
+        save_spans(request.resource_spans)
+        spans = Span.objects.all()
+        print(spans)
 
 
 def unpickle_metrics_request():
