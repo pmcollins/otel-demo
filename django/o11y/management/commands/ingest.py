@@ -63,8 +63,7 @@ class TraceServiceServicer(trace_service_pb2_grpc.TraceServiceServicer):
 
     def Export(self, request, context):
         print('TraceServiceServicer', datetime.now())
-        print(len(request.resource_spans[0].scope_spans[0].spans))
-        pickle_request('trace', request)
+        save_spans(request.resource_spans)
         return trace_service_pb2.ExportTraceServiceResponse()
 
 
