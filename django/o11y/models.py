@@ -28,7 +28,7 @@ class ScopeSpans(models.Model):
     resource = models.ForeignKey(Resource, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.scope
+        return f'ScopeSpans({self.scope})'
 
 
 class Span(models.Model):
@@ -48,6 +48,9 @@ class Span(models.Model):
         CONSUMER = 5, 'Consumer'
 
     kind = models.IntegerField(choices=Kind.choices)
+
+    def __str__(self):
+        return f'Span({self.name})'
 
 
 # trace_id: ">(\364>\212[b\273\337/\027\014\311\n}\233"

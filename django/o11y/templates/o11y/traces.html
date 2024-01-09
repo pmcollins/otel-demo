@@ -1,0 +1,63 @@
+<html lang="en">
+
+<head>
+    <title>OTel Python Demo</title>
+    <style>
+        html {
+            font-family: monospace;
+            font-size: 1.5em;
+            color: #b0b0b0;
+            background-color: black;
+        }
+
+        table {
+            width: 100%;
+        }
+
+        td {
+            vertical-align: top;
+            border: solid #222 1px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>traces</h2>
+
+<table>
+    <tr>
+        <th>Scope</th>
+        <th>Resource</th>
+        <th>Spans</th>
+    </tr>
+    {% for scope_span in scope_spans %}
+        <tr>
+            <td>
+                {{ scope_span.scope }}
+            </td>
+            <td>
+                {% for attr in scope_span.resource.resourceattribute_set.all %}
+                    <div>{{ attr.key }}={{ attr.value }}</div>
+                {% endfor %}
+            </td>
+            <td>
+                <table>
+                    <tr>
+                        <th>Name</th>
+                    </tr>
+                    {% for span in scope_span.span_set.all %}
+                        <tr>
+                            <td>{{ span.name }}</td>
+                            <td>{{ span.get_kind_display }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </td>
+        </tr>
+    {% endfor %}
+</table>
+
+</body>
+
+</html>

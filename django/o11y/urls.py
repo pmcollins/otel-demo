@@ -5,6 +5,7 @@ from o11y import views
 urlpatterns = [
     path("", views.index, name="index"),
     path("metrics/", views.metrics, name="metrics"),
+    path("traces/", views.traces, name="traces"),
     path("fastapi/", views.fastapi, name="fastapi"),
     path("flask/", views.flask, name="flask"),
     path("bottle/", views.bottle, name="bottle"),
