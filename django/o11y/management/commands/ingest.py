@@ -221,6 +221,8 @@ def insert_span(scope_span_model, span_proto):
         trace_id=span_proto.trace_id,
         span_id=span_proto.span_id,
         kind=span_proto.kind,
+        start_time=unix_nano_to_django_model_time(span_proto.start_time_unix_nano),
+        end_time=unix_nano_to_django_model_time(span_proto.end_time_unix_nano),
     ).save()
 
 

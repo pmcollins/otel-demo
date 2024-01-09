@@ -49,6 +49,7 @@
                     {% for span in scope_span.span_set.all %}
                         <tr>
                             <td>{{ span.name }}</td>
+                            <td>{{ span.start_time }}</td>
                             <td>{{ span.get_kind_display }}</td>
                         </tr>
                     {% endfor %}

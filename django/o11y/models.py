@@ -38,6 +38,8 @@ class Span(models.Model):
     # 16 hexadecimal digits (8 bytes)
     span_id = models.CharField(max_length=16)
     name = models.CharField(max_length=256)
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
 
     class Kind(models.IntegerChoices):
         UNSPECIFIED = 0, 'Unspecified'
@@ -52,13 +54,6 @@ class Span(models.Model):
     def __str__(self):
         return f'Span({self.name})'
 
-
-# trace_id: ">(\364>\212[b\273\337/\027\014\311\n}\233"
-# span_id: "L\225g\026b\270|\025"
-# name: "GET index"
-# kind: SPAN_KIND_SERVER
-# start_time_unix_nano: 1704744559938028000
-# end_time_unix_nano: 1704744559951359000
 
 class ScopeMetrics(models.Model):
     scope = models.CharField(max_length=256)
