@@ -32,14 +32,15 @@ class ScopeSpans(models.Model):
 
 
 class Span(models.Model):
-    scope_spans = models.ForeignKey(ScopeSpans, on_delete=models.CASCADE)
+    # 16 hexadecimal digits (8 bytes)
+    span_id = models.CharField(max_length=16, primary_key=True)
+    parent_span_id = models.CharField(max_length=16)
     # 32 hexadecimal digits (16 bytes)
     trace_id = models.CharField(max_length=32)
-    # 16 hexadecimal digits (8 bytes)
-    span_id = models.CharField(max_length=16)
     name = models.CharField(max_length=256)
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
+    scope_spans = models.ForeignKey(ScopeSpans, on_delete=models.CASCADE)
 
     class Kind(models.IntegerChoices):
         UNSPECIFIED = 0, 'Unspecified'

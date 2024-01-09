@@ -63,22 +63,9 @@ class TraceServiceServicer(trace_service_pb2_grpc.TraceServiceServicer):
 
     def Export(self, request, context):
         print('TraceServiceServicer', datetime.now())
+        # pickle_request('trace', request.resource_spans)
         save_spans(request.resource_spans)
         return trace_service_pb2.ExportTraceServiceResponse()
-
-
-def unpickle_request(telemetry_type):
-    with open(get_pickle_fname(telemetry_type), 'rb') as f:
-        return pickle.load(f)
-
-
-def pickle_request(telemetry_type, obj):
-    with open(get_pickle_fname(telemetry_type), 'wb') as f:
-        return pickle.dump(obj, f)
-
-
-def get_pickle_fname(telemetry_type):
-    return f"django/o11y/test_{telemetry_type}_request.pkl"
 
 
 class MetricsServiceServicer(metrics_service_pb2_grpc.MetricsServiceServicer):
@@ -215,15 +202,18 @@ def select_or_insert_scalar_metric(metric, sum_proto, metric_type):
 
 
 def insert_span(scope_span_model, span_proto):
-    Span(
+    span = Span(
         scope_spans=scope_span_model,
         name=span_proto.name,
-        trace_id=span_proto.trace_id,
-        span_id=span_proto.span_id,
+        trace_id=span_proto.trace_id.hex(),
+        span_id=span_proto.span_id.hex(),
         kind=span_proto.kind,
         start_time=unix_nano_to_django_model_time(span_proto.start_time_unix_nano),
         end_time=unix_nano_to_django_model_time(span_proto.end_time_unix_nano),
-    ).save()
+    )
+    if span_proto.parent_span_id:
+        span.parent_span_id = span_proto.parent_span_id.hex()
+    span.save()
 
 
 def insert_log_record(scope_log_model, log_record_proto):
@@ -249,3 +239,18 @@ def insert_point(sm_model, pt_proto):
 def unix_nano_to_django_model_time(time_unix_nano):
     t = datetime.fromtimestamp(time_unix_nano / 1e9)
     return pytz.timezone('UTC').localize(t)
+
+
+def unpickle_request(telemetry_type):
+    with open(get_pickle_fname(telemetry_type), 'rb') as f:
+        return pickle.load(f)
+
+
+i = 0
+def pickle_request(telemetry_type, obj):
+    global i
+    with open(get_pickle_fname(telemetry_type, i), 'wb') as f:
+        return pickle.dump(obj, f)
+
+def get_pickle_fname(telemetry_type, request_number):
+    return f"o11y/test_{telemetry_type}_request-{request_number}.pkl"

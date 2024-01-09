@@ -13,13 +13,13 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="span",
             name="end_time",
-            field=models.DateTimeField(default=datetime.datetime(2000, 1, 1)),
+            field=models.DateTimeField(),
             preserve_default=False,
         ),
         migrations.AddField(
             model_name="span",
             name="start_time",
-            field=models.DateTimeField(default=datetime.datetime(2000, 1, 1)),
+            field=models.DateTimeField(),
             preserve_default=False,
         ),
         migrations.AlterField(

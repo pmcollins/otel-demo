@@ -43,12 +43,11 @@
             </td>
             <td>
                 <table>
-                    <tr>
-                        <th>Name</th>
-                    </tr>
                     {% for span in scope_span.span_set.all %}
                         <tr>
                             <td>{{ span.name }}</td>
+                            <td>{{ span.parent_span_id }}</td>
+                            <td>{{ span.span_id }}</td>
                             <td>{{ span.start_time }}</td>
                             <td>{{ span.get_kind_display }}</td>
                         </tr>
