@@ -13,7 +13,8 @@ from opentelemetry.proto.collector.metrics.v1 import metrics_service_pb2, metric
 from opentelemetry.proto.collector.trace.v1 import trace_service_pb2, trace_service_pb2_grpc
 
 from o11y.models import (
-    Resource, ResourceAttribute, ScopeMetrics, Metric, ScalarMetric, NumberDataPoint, ScopeLogs, LogRecord
+    Resource, ResourceAttribute, ScopeMetrics, Metric, ScalarMetric, NumberDataPoint, ScopeLogs, LogRecord, ScopeSpans,
+    Span
 )
 from o11y.otel_sdk import conditionally_setup_otel_sdk, prep_sdk_arg
 
@@ -62,20 +63,9 @@ class TraceServiceServicer(trace_service_pb2_grpc.TraceServiceServicer):
 
     def Export(self, request, context):
         print('TraceServiceServicer', datetime.now())
-        print(len(request.resource_spans[0].scope_spans[0].spans))
-        # save_spans(request)
+        # pickle_request('trace', request.resource_spans)
+        save_spans(request.resource_spans)
         return trace_service_pb2.ExportTraceServiceResponse()
-
-
-def save_spans(trace_proto):
-    fname = get_serialized_fname('trace')
-    with open(fname, 'w') as f:
-        trace_str = trace_proto.SerializeToString()
-        f.write(trace_str)
-
-
-def get_serialized_fname(telemetry_type):
-    return f"django/o11y/test_{telemetry_type}_request.serialized"
 
 
 class MetricsServiceServicer(metrics_service_pb2_grpc.MetricsServiceServicer):
@@ -94,6 +84,25 @@ class MetricsServiceServicer(metrics_service_pb2_grpc.MetricsServiceServicer):
         return metrics_service_pb2.ExportMetricsServiceResponse()
 
 
+def save_spans(resource_spans_proto):
+    for resource_span_proto in resource_spans_proto:
+        resource_model = select_or_insert_resource(resource_span_proto.resource.attributes)
+        for scope_span_proto in resource_span_proto.scope_spans:
+            scope_span_model = select_or_insert_scope_span(resource_model, scope_span_proto.scope.name)
+            for span_proto in scope_span_proto.spans:
+                insert_span(scope_span_model, span_proto)
+
+
+def save_logs(resource_logs_proto):
+    print('saving logs running!')
+    for resource_log_proto in resource_logs_proto:
+        resource_model = select_or_insert_resource(resource_log_proto.resource.attributes)
+        for scope_logs_proto in resource_log_proto.scope_logs:
+            scope_log_model = select_or_insert_scope_log(resource_model, scope_logs_proto.scope.name)
+            for log_record_proto in scope_logs_proto.log_records:
+                insert_log_record(scope_log_model, log_record_proto)
+
+
 def save_metrics(resource_metrics_proto):
     print('save metrics running')
     for resource_metric_proto in resource_metrics_proto:
@@ -106,16 +115,6 @@ def save_metrics(resource_metrics_proto):
                     sm_model = select_or_insert_scalar_metric(metric_model, metric_proto.sum, 'sum')
                     for pt_proto in metric_proto.sum.data_points:
                         insert_point(sm_model, pt_proto)
-
-
-def save_logs(resource_logs_proto):
-    print('saving logs running!')
-    for resource_log_proto in resource_logs_proto:
-        resource_model = select_or_insert_resource(resource_log_proto.resource.attributes)
-        for scope_logs_proto in resource_log_proto.scope_logs:
-            scope_log_model = select_or_insert_scope_log(resource_model, scope_logs_proto.scope.name)
-            for log_record_proto in scope_logs_proto.log_records:
-                insert_log_record(scope_log_model, log_record_proto)
 
 
 def select_or_insert_resource(attrs):
@@ -136,6 +135,16 @@ def select_or_insert_resource(attrs):
                 resource=resource,
             ).save()
     return resource
+
+
+def select_or_insert_scope_span(resource, scope):
+    existing_scope_spans = resource.scopespans_set.filter(scope=scope)
+    if len(existing_scope_spans):
+        scope_span = existing_scope_spans.first()
+    else:
+        scope_span = ScopeSpans(scope=scope, resource=resource)
+        scope_span.save()
+    return scope_span
 
 
 def select_or_insert_scope_metric(resource, scope):
@@ -192,6 +201,21 @@ def select_or_insert_scalar_metric(metric, sum_proto, metric_type):
     return scalar_metric
 
 
+def insert_span(scope_span_model, span_proto):
+    span = Span(
+        scope_spans=scope_span_model,
+        name=span_proto.name,
+        trace_id=span_proto.trace_id.hex(),
+        span_id=span_proto.span_id.hex(),
+        kind=span_proto.kind,
+        start_time=unix_nano_to_django_model_time(span_proto.start_time_unix_nano),
+        end_time=unix_nano_to_django_model_time(span_proto.end_time_unix_nano),
+    )
+    if span_proto.parent_span_id:
+        span.parent_span_id = span_proto.parent_span_id.hex()
+    span.save()
+
+
 def insert_log_record(scope_log_model, log_record_proto):
     LogRecord(
         time=unix_nano_to_django_model_time(log_record_proto.time_unix_nano),
@@ -215,3 +239,18 @@ def insert_point(sm_model, pt_proto):
 def unix_nano_to_django_model_time(time_unix_nano):
     t = datetime.fromtimestamp(time_unix_nano / 1e9)
     return pytz.timezone('UTC').localize(t)
+
+
+def unpickle_request(telemetry_type):
+    with open(get_pickle_fname(telemetry_type), 'rb') as f:
+        return pickle.load(f)
+
+
+i = 0
+def pickle_request(telemetry_type, obj):
+    global i
+    with open(get_pickle_fname(telemetry_type, i), 'wb') as f:
+        return pickle.dump(obj, f)
+
+def get_pickle_fname(telemetry_type, request_number):
+    return f"o11y/test_{telemetry_type}_request-{request_number}.pkl"

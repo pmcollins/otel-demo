@@ -23,6 +23,39 @@ class ResourceAttribute(models.Model):
         return f'{self.key}: {self.value}'
 
 
+class ScopeSpans(models.Model):
+    scope = models.CharField(max_length=256)
+    resource = models.ForeignKey(Resource, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'ScopeSpans({self.scope})'
+
+
+class Span(models.Model):
+    # 16 hexadecimal digits (8 bytes)
+    span_id = models.CharField(max_length=16, primary_key=True)
+    parent_span_id = models.CharField(max_length=16)
+    # 32 hexadecimal digits (16 bytes)
+    trace_id = models.CharField(max_length=32)
+    name = models.CharField(max_length=256)
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
+    scope_spans = models.ForeignKey(ScopeSpans, on_delete=models.CASCADE)
+
+    class Kind(models.IntegerChoices):
+        UNSPECIFIED = 0, 'Unspecified'
+        INTERNAL = 1, 'Internal'
+        SERVER = 2, 'Server'
+        CLIENT = 3, 'Client'
+        PRODUCER = 4, 'Producer'
+        CONSUMER = 5, 'Consumer'
+
+    kind = models.IntegerField(choices=Kind.choices)
+
+    def __str__(self):
+        return f'Span({self.name})'
+
+
 class ScopeMetrics(models.Model):
     scope = models.CharField(max_length=256)
     resource = models.ForeignKey(Resource, on_delete=models.CASCADE)

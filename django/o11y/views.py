@@ -6,7 +6,7 @@ import httpx
 from django.http import JsonResponse
 from django.shortcuts import render
 
-from o11y.models import ScopeMetrics
+from o11y.models import ScopeMetrics, ScopeSpans
 
 
 def index(req):
@@ -17,6 +17,14 @@ def metrics(req):
         req,
         'o11y/metrics.html',
         {'scope_metrics': ScopeMetrics.objects.all()}
+    )
+
+def traces(req):
+    spans = ScopeSpans.objects.all()
+    return render(
+        req,
+        'o11y/traces.html',
+        {'scope_spans': spans}
     )
 
 def fastapi(req):
