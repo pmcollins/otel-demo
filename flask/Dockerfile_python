@@ -1,9 +1,0 @@
-FROM python:3.10
-WORKDIR /app
-COPY . /app
-ENV OTEL_EXPORTER_OTLP_ENDPOINT=192.168.86.195:4317
-ENV OTEL_EXPORTER_OTLP_INSECURE=true
-RUN pip install --no-cache-dir -r requirements.txt
-RUN splunk-py-trace-bootstrap
-EXPOSE 9999
-CMD ["splunk-py-trace", "python", "main.py"]

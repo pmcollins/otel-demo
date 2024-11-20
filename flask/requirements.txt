@@ -1,3 +1,0 @@
-Flask
-splunk-opentelemetry[all]
-opentelemetry-exporter-otlp-proto-grpc
