@@ -1,1 +1,1 @@
-start_ingest.sh
+start_server.sh
